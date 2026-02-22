@@ -27,6 +27,9 @@ const emptyMessage = document.getElementById('emptyMessage');
 const taskListWork = document.getElementById('taskListWork');
 const taskListPrivate = document.getElementById('taskListPrivate');
 const taskListCompleted = document.getElementById('taskListCompleted');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebarToggle = document.getElementById('sidebarToggle');
 
 const TASK_LISTS = { work: taskListWork, private: taskListPrivate };
 function getListByTag(tag) {
@@ -34,6 +37,51 @@ function getListByTag(tag) {
 }
 function isCompletedList(list) {
   return list === taskListCompleted;
+}
+
+// サイドバー: 表示中のフォルダ（work / private / completed）
+let activeTab = 'work';
+const TAB_LABELS = { all: '全部', work: '仕事', private: 'プライベート', completed: '完了したタスク' };
+
+function switchTab(tab) {
+  if (activeTab === tab) return;
+  activeTab = tab;
+  document.querySelectorAll('.sidebar__tab').forEach((btn) => {
+    const isActive = btn.dataset.tab === tab;
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-current', isActive ? 'page' : null);
+  });
+  const showAll = tab === 'all';
+  document.querySelectorAll('.task-folder--panel').forEach((folder) => {
+    folder.classList.toggle('is-active', showAll || folder.dataset.tag === tab);
+  });
+  const sectionTitle = document.getElementById('taskListSectionTitle');
+  if (sectionTitle) sectionTitle.textContent = TAB_LABELS[tab];
+  updateEmptyMessage();
+  if (window.matchMedia('(max-width: 768px)').matches) closeSidebar();
+}
+
+function openSidebar() {
+  if (!sidebar || !sidebarOverlay || !sidebarToggle) return;
+  sidebar.classList.add('is-open');
+  sidebarOverlay.classList.add('is-visible');
+  sidebarOverlay.setAttribute('aria-hidden', 'false');
+  sidebarToggle.setAttribute('aria-expanded', 'true');
+  sidebarToggle.setAttribute('aria-label', 'メニューを閉じる');
+  document.body.classList.add('sidebar-open');
+}
+function closeSidebar() {
+  if (!sidebar || !sidebarOverlay || !sidebarToggle) return;
+  sidebar.classList.remove('is-open');
+  sidebarOverlay.classList.remove('is-visible');
+  sidebarOverlay.setAttribute('aria-hidden', 'true');
+  sidebarToggle.setAttribute('aria-expanded', 'false');
+  sidebarToggle.setAttribute('aria-label', 'メニューを開く');
+  document.body.classList.remove('sidebar-open');
+}
+function toggleSidebar() {
+  if (sidebar && sidebar.classList.contains('is-open')) closeSidebar();
+  else openSidebar();
 }
 
 // 並び替え用: ドラッグ中の要素を保持（同じフォルダ内でのみドロップ許可）
@@ -153,11 +201,17 @@ function loadTasksFromStorage() {
   }
 }
 
-// 「タスクがありません」はやるべきタスク0件のとき。フォルダは1件でもあれば表示
+// 「タスクがありません」は表示中のフォルダが空のとき。フォルダエリアは常に表示
 function updateEmptyMessage() {
   const activeCount = taskListWork.children.length + taskListPrivate.children.length;
   const totalCount = activeCount + taskListCompleted.children.length;
-  emptyMessage.style.display = activeCount === 0 ? '' : 'none';
+  const isEmpty = activeTab === 'all'
+    ? totalCount === 0
+    : (activeTab === 'work' ? taskListWork : activeTab === 'private' ? taskListPrivate : taskListCompleted).children.length === 0;
+  emptyMessage.style.display = isEmpty ? '' : 'none';
+  emptyMessage.textContent = activeTab === 'completed'
+    ? '完了したタスクはありません。'
+    : 'タスクがありません。上から追加してください。';
   taskFolders.style.display = totalCount === 0 ? 'none' : '';
 }
 
@@ -283,3 +337,11 @@ taskForm.addEventListener('submit', (event) => {
   updateEmptyMessage();
   saveTasksToStorage();
 });
+
+// サイドバー: タブクリックで表示フォルダを切り替え
+document.querySelectorAll('.sidebar__tab').forEach((btn) => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+switchTab('work'); // 初期表示の見出し・empty を同期

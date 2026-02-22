@@ -48,17 +48,117 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   min-height: 100vh;
+}
+.app-layout {
   display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
 }
 .app-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow-x: hidden; /* スマホで横スクロールはここで止める（トースト等は body 直下で表示） */
+  overflow-x: hidden;
 }
 
+/* ========================================
+   サイドバー（フォルダタブ）
+   ======================================== */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 98;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+@media (min-width: 769px) {
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 11rem;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-lg) 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.sidebar__tab {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.9375rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-align: left;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+}
+.sidebar__tab:hover {
+  color: var(--color-text);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.sidebar__tab.is-active {
+  color: var(--color-primary);
+  background-color: rgba(37, 99, 235, 0.06);
+  border-left-color: var(--color-primary);
+}
+.sidebar__tab[data-tab="private"].is-active {
+  color: var(--color-tag-private);
+  background-color: rgba(124, 58, 237, 0.06);
+  border-left-color: var(--color-tag-private);
+}
+.sidebar__tab[data-tab="completed"].is-active {
+  color: var(--color-text-muted);
+  border-left-color: rgba(34, 197, 94, 0.6);
+}
+
+/* ヘッダー: メニューボタン（スマホでサイドバー開閉） */
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  margin-right: var(--space-sm);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.sidebar-toggle__icon {
+  display: block;
+  width: 1.125rem;
+  height: 2px;
+  background-color: currentColor;
+  box-shadow: 0 -5px 0 currentColor, 0 5px 0 currentColor;
+}
 /* アクセシビリティ: スクリーンリーダー用のテキスト（見た目は非表示） */
 .visually-hidden {
   position: absolute;
@@ -76,6 +176,8 @@ body {
    レイアウト: ヘッダー
    ======================================== */
 .header {
+  display: flex;
+  align-items: center;
   background-color: var(--color-surface);
   padding: var(--space-xl) var(--space-2xl);
   box-shadow: var(--shadow);
@@ -191,9 +293,17 @@ body {
 
 /* タグごとのフォルダ（タスク行とは別のブロックとして表現） */
 .task-folders {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  display: block;
+}
+/* サイドバーで選んだフォルダだけ表示（「全部」のときは3つとも表示） */
+.task-folder--panel {
+  display: none;
+}
+.task-folder--panel.is-active {
+  display: block;
+}
+.task-folder--panel.is-active + .task-folder--panel.is-active {
+  margin-top: var(--space-xl);
 }
 .task-folder {
   border: 1px solid var(--color-border);
@@ -512,33 +622,171 @@ body {
 }
 
 /* ========================================
-   スマホ用レイアウト（入力欄・ボタンがはみ出さない）
+   スマホ用レイアウト（余白を詰めて入力欄を広く）
    ======================================== */
-@media (max-width: 640px) {
-  .main {
-    padding: var(--space-xl) var(--space-md);
+/* タブレット・スマホ: サイドバーはドロワー、全体の余白を抑える */
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    display: block;
   }
-  .task-form {
-    gap: var(--space-xs);
+  .sidebar-toggle {
+    display: inline-flex;
   }
-  .task-form__input {
-    padding: var(--space-sm) var(--space-md);
-    font-size: 16px; /* iOS でズーム防止 */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    width: 14rem;
+    max-width: 80vw;
+    padding: var(--space-lg) 0;
+    padding-top: calc(var(--space-lg) + 2.75rem);
+    box-shadow: none;
+    transform: translateX(-100%);
   }
-  .task-form__submit {
+  .sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+  .sidebar__tab {
     padding: var(--space-sm) var(--space-md);
     font-size: 0.9375rem;
   }
-  .task-list {
-    padding: var(--space-xs);
+  body.sidebar-open {
+    overflow: hidden;
   }
-  .task-list__item {
-    padding: var(--space-md) var(--space-md);
+  .main {
+    padding: var(--space-lg) var(--space-md);
+    max-width: none;
+  }
+  .input-section {
+    margin-bottom: var(--space-lg);
+  }
+  .task-list-section__title {
+    margin-bottom: var(--space-md);
+    padding-left: 0;
   }
   .header {
-    padding: var(--space-lg) var(--space-md);
+    padding: var(--space-md) var(--space-md);
+  }
+  .header__title {
+    font-size: 1.125rem;
   }
   .footer {
-    padding: var(--space-lg) var(--space-md);
+    padding: var(--space-md) var(--space-md);
+  }
+  .task-form {
+    gap: 0.5rem;
+  }
+  .task-form__tag {
+    min-width: 5.5rem;
+    padding: var(--space-sm) var(--space-sm);
+    padding-right: 1.75rem;
+    font-size: 0.8125rem;
+  }
+  .task-form__input {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 16px;
+    min-width: 0;
+  }
+  .task-form__submit {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+  }
+  .task-folder__title {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.75rem;
+  }
+  .task-folder__list {
+    padding: var(--space-sm);
+    gap: 0.5rem;
+  }
+  .task-list__item {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.9375rem;
+  }
+  .task-list__empty {
+    padding: var(--space-xl) var(--space-md);
+    font-size: 0.875rem;
+  }
+  .task-folder--panel.is-active + .task-folder--panel.is-active {
+    margin-top: var(--space-lg);
+  }
+}
+
+/* 小型スマホ: さらに余白を詰め、入力欄を最大に */
+@media (max-width: 480px) {
+  .main {
+    padding: var(--space-md) 0.75rem;
+  }
+  .header {
+    padding: var(--space-sm) 0.75rem;
+  }
+  .header__title {
+    font-size: 1rem;
+  }
+  .sidebar-toggle {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-right: var(--space-xs);
+  }
+  .input-section {
+    margin-bottom: var(--space-md);
+  }
+  .task-form {
+    gap: 0.375rem;
+  }
+  .task-form__tag {
+    min-width: 4.5rem;
+    padding: 0.5rem 0.5rem;
+    padding-right: 1.5rem;
+    font-size: 0.75rem;
+  }
+  .task-form__input {
+    padding: 0.5rem 0.75rem;
+  }
+  .task-form__submit {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+  .task-list-section__title {
+    margin-bottom: var(--space-sm);
+    font-size: 0.875rem;
+  }
+  .task-folder__title {
+    padding: 0.5rem 0.75rem;
+  }
+  .task-folder__list {
+    padding: 0.5rem;
+    gap: 0.375rem;
+  }
+  .task-list__item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  .task-list__drag-handle {
+    width: 1.25rem;
+    font-size: 0.75rem;
+  }
+  .task-list__tag-label {
+    font-size: 0.625rem;
+    padding: 0.15em 0.4em;
+  }
+  .task-list__delete {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1rem;
+  }
+  .task-list__empty {
+    padding: var(--space-lg) 0.75rem;
+    font-size: 0.8125rem;
+  }
+  .footer {
+    padding: var(--space-sm) 0.75rem;
+    font-size: 0.8125rem;
+  }
+  .task-folder--panel.is-active + .task-folder--panel.is-active {
+    margin-top: var(--space-md);
   }
 }

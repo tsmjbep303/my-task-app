@@ -10,13 +10,30 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="app-wrap">
-  <!-- ヘッダー: アプリのロゴやナビゲーションを置く領域 -->
+  <!-- スマホ用: サイドバー開いているときの背景オーバーレイ -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="app-layout">
+    <!-- サイドバー: フォルダ切り替えタブ（スマホではドロワーで開閉） -->
+    <aside class="sidebar" id="sidebar" aria-label="フォルダ">
+      <nav class="sidebar__nav">
+        <button type="button" class="sidebar__tab" data-tab="all">全部</button>
+        <button type="button" class="sidebar__tab is-active" data-tab="work" aria-current="page">仕事</button>
+        <button type="button" class="sidebar__tab" data-tab="private">プライベート</button>
+        <button type="button" class="sidebar__tab" data-tab="completed">完了したタスク</button>
+      </nav>
+    </aside>
+
+    <div class="app-wrap">
+  <!-- ヘッダー -->
   <header class="header">
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="sidebar">
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
     <h1 class="header__title">マイ・タスク</h1>
   </header>
 
-  <!-- メインコンテンツ: ページの中心となるコンテンツ領域 -->
+  <!-- メインコンテンツ -->
   <main class="main">
     <!-- フォーム: ユーザー入力を受け取るUI（後でJSで制御） -->
     <section class="input-section" aria-label="タスク入力">
@@ -38,22 +55,22 @@
       </form>
     </section>
 
-    <!-- タスク一覧: タグごとのフォルダで表示 -->
+    <!-- タスク一覧: 選択したフォルダだけ表示 -->
     <section class="task-list-section" aria-label="タスク一覧">
-      <h2 class="task-list-section__title">タスク一覧</h2>
+      <h2 class="task-list-section__title" id="taskListSectionTitle">タスク一覧</h2>
       <p class="task-list__empty" id="emptyMessage">
         タスクがありません。上から追加してください。
       </p>
       <div class="task-folders" id="taskFolders">
-        <div class="task-folder" data-tag="work" aria-label="仕事">
+        <div class="task-folder task-folder--panel is-active" data-tag="work" aria-label="仕事">
           <h3 class="task-folder__title">仕事</h3>
           <ul class="task-folder__list" id="taskListWork" aria-label="仕事のタスク"></ul>
         </div>
-        <div class="task-folder" data-tag="private" aria-label="プライベート">
+        <div class="task-folder task-folder--panel" data-tag="private" aria-label="プライベート">
           <h3 class="task-folder__title">プライベート</h3>
           <ul class="task-folder__list" id="taskListPrivate" aria-label="プライベートのタスク"></ul>
         </div>
-        <div class="task-folder task-folder--completed" data-tag="completed" aria-label="完了したタスク">
+        <div class="task-folder task-folder--panel task-folder--completed" data-tag="completed" aria-label="完了したタスク">
           <h3 class="task-folder__title">完了したタスク</h3>
           <ul class="task-folder__list" id="taskListCompleted" aria-label="完了したタスク"></ul>
         </div>
@@ -65,9 +82,10 @@
   <footer class="footer">
     <p class="footer__text">&copy; タスクアプリ</p>
   </footer>
+    </div>
   </div>
 
-  <!-- スクリプト: インタラクションはJSで実装（次のステップ） -->
+  <script src="js/app.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
