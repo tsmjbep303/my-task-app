@@ -13,6 +13,9 @@
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
   --color-danger: #dc2626;
+  /* タグ別の色（左ボーダー・ラベル用。itemは塗りつぶさない） */
+  --color-tag-work: #2563eb;
+  --color-tag-private: #7c3aed;
   --radius: 10px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
@@ -108,6 +111,33 @@ body {
   min-width: 0; /* スマホで親がはみ出さないように */
 }
 
+.task-form__tag {
+  flex-shrink: 0;
+  min-width: 7rem;
+  margin-right: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  padding-right: 2.25rem; /* 矢印＋右余白を確保 */
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  /* ネイティブの矢印を消して、余白が効くようにする */
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 0.75rem;
+}
+.task-form__tag:focus {
+  outline: none;
+  border-color: var(--color-focus-ring);
+}
+
 .task-form__input {
   flex: 1;
   min-width: 0; /*  flex で入力欄が縮むように（はみ出し防止） */
@@ -159,6 +189,51 @@ body {
   padding-left: var(--space-xs);
 }
 
+/* タグごとのフォルダ（タスク行とは別のブロックとして表現） */
+.task-folders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.task-folder {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background-color: var(--color-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.task-folder__title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  padding: var(--space-md) var(--space-lg);
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+.task-folder[data-tag="work"] .task-folder__title {
+  color: var(--color-tag-work);
+  border-left: 4px solid var(--color-tag-work);
+}
+.task-folder[data-tag="private"] .task-folder__title {
+  color: var(--color-tag-private);
+  border-left: 4px solid var(--color-tag-private);
+}
+.task-folder--completed .task-folder__title {
+  color: var(--color-text-muted);
+  border-left: 4px solid rgba(34, 197, 94, 0.6);
+}
+.task-folder__list {
+  list-style: none;
+  padding: var(--space-md);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 0;
+  background-color: var(--color-bg);
+}
 .task-list {
   list-style: none;
   padding: var(--space-sm);
@@ -171,6 +246,7 @@ body {
 
 /* タスク1件の行（ごく薄い影で背景から浮いた印象） */
 .task-list__item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -184,6 +260,71 @@ body {
 }
 .task-list__item + .task-list__item {
   margin-top: 0;
+}
+
+/* 並び替え用ドラッグハンドル */
+.task-list__drag-handle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  color: var(--color-text-muted);
+  cursor: grab;
+  user-select: none;
+  font-size: 0.875rem;
+  letter-spacing: -0.2em;
+}
+.task-list__drag-handle:active {
+  cursor: grabbing;
+}
+.task-list__item.is-dragging {
+  opacity: 0.6;
+}
+.task-list__item.is-dragging .task-list__drag-handle {
+  cursor: grabbing;
+}
+/* ドロップ時は「この上（＝アイテムの間）に挿入」と分かるように線だけ表示 */
+.task-list__item.is-drag-over {
+  box-shadow: none;
+}
+.task-list__item.is-drag-over::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -3px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* タグ別の色分け（左のアクセント線のみ。背景は塗らないので完了時の緑と競合しない） */
+.task-list__item--work {
+  border-left: 4px solid var(--color-tag-work);
+}
+.task-list__item--private {
+  border-left: 4px solid var(--color-tag-private);
+}
+
+.task-list__tag-label {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.task-list__item--work .task-list__tag-label {
+  color: var(--color-tag-work);
+  background-color: rgba(37, 99, 235, 0.12);
+}
+.task-list__item--private .task-list__tag-label {
+  color: var(--color-tag-private);
+  background-color: rgba(124, 58, 237, 0.12);
 }
 
 /* 完了用ラベル（チェックボックス＋テキスト。クリックでチェック切り替え） */
