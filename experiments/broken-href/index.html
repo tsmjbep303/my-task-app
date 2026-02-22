@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タスクアプリ（href壊し実験）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- わざと壊したパス: css → csss -->
+  <link rel="stylesheet" href="../../csss/style.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header__title">タスクアプリ</h1>
+  </header>
+  <main class="main">
+    <section class="input-section" aria-label="タスク入力">
+      <form class="task-form" id="taskForm">
+        <label for="taskInput" class="visually-hidden">新しいタスク</label>
+        <input type="text" id="taskInput" class="task-form__input" placeholder="やることを入力..." autocomplete="off">
+        <button type="submit" class="task-form__submit">追加</button>
+      </form>
+    </section>
+    <section class="task-list-section" aria-label="タスク一覧">
+      <h2 class="task-list-section__title">タスク一覧</h2>
+      <ul class="task-list" id="taskList">
+        <li class="task-list__empty" id="emptyMessage">タスクがありません。上から追加してください。</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="footer">
+    <p class="footer__text">&copy; タスクアプリ</p>
+  </footer>
+  <!-- わざと壊したパス: app.js → appp.js -->
+  <script src="../../js/appp.js"></script>
+</body>
+</html>

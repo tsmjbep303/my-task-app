@@ -1,0 +1,403 @@
+/* ========================================
+   CSS変数（カスタムプロパティ）
+   色や余白を一箇所で管理 → テーマ変更が楽になる
+   ======================================== */
+:root {
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-glow: rgba(37, 99, 235, 0.25);
+  --color-focus-ring: #3b82f6;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-danger: #dc2626;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  /* ゆったり余白（広め） */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 5rem;
+  /* リスト項目用のごく薄い影（浮き上がり） */
+  --shadow-item: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* リセット: ブラウザのデフォルトスタイルを打ち消し、挙動を統一 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ベース: 全体に共通するスタイル（フォント・行間・背景） */
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-x: hidden; /* スマホで横スクロールはここで止める（トースト等は body 直下で表示） */
+}
+
+/* アクセシビリティ: スクリーンリーダー用のテキスト（見た目は非表示） */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ========================================
+   レイアウト: ヘッダー
+   ======================================== */
+.header {
+  background-color: var(--color-surface);
+  padding: var(--space-xl) var(--space-2xl);
+  box-shadow: var(--shadow);
+}
+
+.header__title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+}
+
+/* ========================================
+   レイアウト: メイン（コンテンツを中央に寄せる） 
+   ======================================== */
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-2xl);
+  min-width: 0;
+}
+
+/* 入力セクション（フォーム） */
+.input-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.task-form {
+  display: flex;
+  gap: var(--space-sm);
+  min-width: 0; /* スマホで親がはみ出さないように */
+}
+
+.task-form__input {
+  flex: 1;
+  min-width: 0; /*  flex で入力欄が縮むように（はみ出し防止） */
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, outline 0.2s ease;
+}
+
+/* フォーカス時: おしゃれな枠線とグロー */
+.task-form__input:focus {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
+}
+.task-form__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.task-form__submit {
+  flex-shrink: 0; /* ボタンがつぶれないように */
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.task-form__submit:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ========================================
+   タスク一覧セクション
+   ======================================== */
+.task-list-section__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+  padding-left: var(--space-xs);
+}
+
+.task-list {
+  list-style: none;
+  padding: var(--space-sm);
+  background: transparent;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* タスク1件の行（ごく薄い影で背景から浮いた印象） */
+.task-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  border-bottom: none;
+  font-size: 1rem;
+  box-shadow: var(--shadow-item);
+  transition: background-color 0.4s ease;
+}
+.task-list__item + .task-list__item {
+  margin-top: 0;
+}
+
+/* 完了用ラベル（チェックボックス＋テキスト。クリックでチェック切り替え） */
+.task-list__complete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+.task-list__checkbox {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+}
+.task-list__text {
+  flex: 1;
+  min-width: 0;
+  /* 完了時にスッと薄くなる transition（0.4秒でお祝い感） */
+  transition: color 0.4s ease, opacity 0.4s ease, text-decoration-color 0.4s ease;
+}
+
+/* 完了状態: クラス is-completed が付いたとき（薄い緑背景＋打ち消し） */
+.task-list__item.is-completed {
+  background-color: rgba(34, 197, 94, 0.08);
+  transition: background-color 0.4s ease;
+}
+.task-list__item.is-completed .task-list__text {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+/* 完了直後のパルス／スケール（その行だけ一瞬ふわっと） */
+.task-list__item.is-just-completed {
+  animation: task-complete-pulse 0.45s ease-out;
+}
+@keyframes task-complete-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: var(--shadow-item);
+  }
+  35% {
+    transform: scale(1.03);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25), 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-item);
+  }
+}
+
+/* 削除ボタン（×アイコン、ホバーで赤く） */
+.task-list__delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.task-list__delete:hover {
+  color: var(--color-danger);
+  background-color: rgba(220, 38, 38, 0.08);
+  border-color: var(--color-danger);
+}
+
+/* 空状態のメッセージ（タスクが0件のとき表示） */
+.task-list__empty {
+  padding: var(--space-3xl) var(--space-2xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-item);
+}
+
+/* ========================================
+   フッター
+   ======================================== */
+.footer {
+  padding: var(--space-xl) var(--space-2xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer__text {
+  margin: 0;
+}
+
+/* トースト（完了時のお祝いメッセージ） */
+.toast {
+  position: fixed;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%) translateY(1rem);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: rgba(34, 197, 94, 0.95);
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 紙吹雪（完了時だけ・画面上方から落下） */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  overflow: visible;
+}
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: confetti-fall 2.8s ease-in forwards;
+}
+@keyframes confetti-fall {
+  from {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0.5;
+  }
+}
+
+/* キラキラ（完了した行のまわりに★が光る） */
+.sparkle {
+  position: fixed;
+  font-size: 14px;
+  color: #fbbf24;
+  text-shadow: 0 0 6px rgba(251, 191, 36, 0.9);
+  pointer-events: none;
+  z-index: 998;
+  margin-left: -0.5em;
+  margin-top: -0.5em;
+  animation: sparkle-pop 0.6s ease-out forwards;
+  opacity: 0;
+}
+@keyframes sparkle-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   スマホ用レイアウト（入力欄・ボタンがはみ出さない）
+   ======================================== */
+@media (max-width: 640px) {
+  .main {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .task-form {
+    gap: var(--space-xs);
+  }
+  .task-form__input {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 16px; /* iOS でズーム防止 */
+  }
+  .task-form__submit {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.9375rem;
+  }
+  .task-list {
+    padding: var(--space-xs);
+  }
+  .task-list__item {
+    padding: var(--space-md) var(--space-md);
+  }
+  .header {
+    padding: var(--space-lg) var(--space-md);
+  }
+  .footer {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
